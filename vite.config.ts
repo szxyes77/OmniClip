@@ -19,5 +19,13 @@ export default defineConfig({
     target: process.env.TAURI_ARCH === "x86_64" ? "es2021" : "es2020",
     minify: !process.env.TAURI_DEBUG ? "esbuild" : false,
     sourcemap: !!process.env.TAURI_DEBUG,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+    esbuild: {
+      drop: process.env.TAURI_DEBUG ? [] : ['console', 'debugger'],
+    },
   },
 });

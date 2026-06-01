@@ -10,6 +10,7 @@ build/
 
 # Tauri build output
 src-tauri/target/
+release/
 
 # IDE / Editor
 .idea/

@@ -11,12 +11,24 @@ export default function App() {
   const { t } = useI18n();
   const { loadInitial, refreshTags, loadSettings } = useClipboardStore();
   const [showSettings, setShowSettings] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    loadInitial();
-    refreshTags();
-    loadSettings();
+    const init = async () => {
+      await Promise.all([loadInitial(), refreshTags(), loadSettings()]);
+      setIsReady(true);
+      const splash = document.getElementById("splash-screen");
+      if (splash) {
+        splash.classList.add("fade-out");
+        setTimeout(() => splash.remove(), 300);
+      }
+    };
+    init();
   }, []);
+
+  if (!isReady) {
+    return null;
+  }
 
   if (showSettings) {
     return (

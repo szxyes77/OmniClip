@@ -185,7 +185,7 @@ export function OverlayWindow() {
       onWheel={handleWheel}
       tabIndex={0}
     >
-      <div className="px-3 py-2 border-b border-white/10">
+      <div className="px-3 py-2 border-b border-white/10 cursor-move" data-tauri-drag-region>
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-gray-300">Quick Paste</span>
           <span className="text-[10px] text-gray-500">

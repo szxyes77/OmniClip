@@ -82,7 +82,7 @@ export function FloatingWindow() {
       className="w-full h-full glass-dark rounded-xl overflow-hidden animate-scale-in"
       onKeyDown={handleKeyDown}
     >
-      <div className="px-3 py-2.5 border-b border-white/10">
+      <div className="px-3 py-2.5 border-b border-white/10" data-tauri-drag-region>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg">
           <Search className="w-4 h-4 text-gray-400" />
           <input

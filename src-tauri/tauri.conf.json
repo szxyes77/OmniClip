@@ -19,11 +19,12 @@
         "title": "OmniClip",
         "width": 900,
         "height": 650,
-        "minWidth": 700,
-        "minHeight": 500,
+        "minWidth": 800,
+        "minHeight": 600,
         "resizable": true,
         "center": true,
-        "visible": true
+        "visible": true,
+        "dragDropEnabled": false
       },
       {
         "label": "floating",
@@ -42,6 +43,7 @@
       {
         "label": "overlay",
         "title": "OmniClip Overlay",
+        "url": "index.html",
         "width": 340,
         "height": 480,
         "resizable": false,
@@ -57,7 +59,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["msi", "nsis"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -66,6 +68,19 @@
       "icons/icon.ico"
     ],
     "shortDescription": "Smart Clipboard Manager",
-    "category": "Utility"
+    "category": "Utility",
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "languages": ["SimpChinese", "English"],
+        "displayLanguageSelector": true
+      }
+    }
   }
 }

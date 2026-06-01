@@ -11,7 +11,7 @@ use database::DatabaseManager;
 use encryption::EncryptionManager;
 use search::SearchEngine;
 use std::sync::{Arc, Mutex};
-use tauri::{Manager, State};
+use tauri::{Manager, State, Emitter};
 
 pub struct AppState {
     pub db: Arc<Mutex<DatabaseManager>>,
@@ -404,8 +404,6 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .plugin(tauri_plugin_sql::Builder::default().build())
-        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let app_handle = app.app_handle();
@@ -437,6 +435,18 @@ pub fn run() {
             clipboard::monitor::start_monitoring(&app_handle)?;
             tray::setup::setup_system_tray(&app_handle)?;
             overlay::setup_overlay(&app_handle)?;
+
+            if let Some(main_window) = app.get_webview_window("main") {
+                let app_handle_clone = app_handle.clone();
+                main_window.on_window_event(move |event| {
+                    if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                        api.prevent_close();
+                        if let Some(w) = app_handle_clone.get_webview_window("main") {
+                            let _ = w.hide();
+                        }
+                    }
+                });
+            }
 
             Ok(())
         })

@@ -30,6 +30,10 @@ pub fn start_monitoring(app: &AppHandle) -> Result<(), String> {
             loop {
                 interval.tick().await;
 
+                if !crate::tray::setup::is_monitoring() {
+                    continue;
+                }
+
                 if let Some(content) = read_clipboard(&mut clipboard) {
                     let hash = compute_hash(&content.content);
 

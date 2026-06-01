@@ -1,9 +1,6 @@
-use crate::database::models::ClipboardRecord;
-use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::io::Cursor;
-use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ClipboardType {
