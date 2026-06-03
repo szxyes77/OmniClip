@@ -58,3 +58,19 @@ src-tauri/gen/
 # Backup files
 *.bak
 *.backup
+
+# Mock servers (development only)
+mock-server.cjs
+mock-server.js
+
+# Build logs
+omniclip_mobile/build_log.txt
+
+# Flutter test directory
+omniclip_mobile/test/
+
+# Duplicate mobile directory (typo)
+omniclip_mobil/
+
+# Error logs
+src-tauri/errors.txt
