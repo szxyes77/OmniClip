@@ -1,7 +1,7 @@
 {
   "productName": "OmniClip",
   "version": "0.1.0",
-  "identifier": "com.omniclip.app",
+  "identifier": "com.omniclip.desktop",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -25,35 +25,6 @@
         "center": true,
         "visible": true,
         "dragDropEnabled": false
-      },
-      {
-        "label": "floating",
-        "title": "OmniClip",
-        "width": 380,
-        "height": 500,
-        "resizable": false,
-        "transparent": true,
-        "decorations": false,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "center": false,
-        "visible": false,
-        "focus": true
-      },
-      {
-        "label": "overlay",
-        "title": "OmniClip Overlay",
-        "url": "index.html",
-        "width": 340,
-        "height": 480,
-        "resizable": false,
-        "transparent": true,
-        "decorations": false,
-        "alwaysOnTop": true,
-        "skipTaskbar": true,
-        "center": false,
-        "visible": false,
-        "focus": false
       }
     ]
   },

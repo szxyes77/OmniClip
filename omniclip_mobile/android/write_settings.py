@@ -1,0 +1,31 @@
+import os
+
+content = r'''pluginManagement {
+    def flutterSdkPath = {
+        def properties = new Properties()
+        file("local.properties").withInputStream { properties.load(it) }
+        def flutterSdkPath = properties.getProperty("flutter.sdk")
+        assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+        return flutterSdkPath
+    }
+    settings.ext.flutterSdkPath = flutterSdkPath()
+    includeBuild("${settings.ext.flutterSdkPath}/packages/flutter_tools/gradle")
+
+    repositories {
+        maven { url "https://mirrors.cloud.tencent.com/nexus/repository/maven-public/" }
+        google()
+        gradlePluginPortal()
+    }
+}
+
+plugins {
+    id "dev.flutter.flutter-plugin-loader" version "1.0.0"
+    id "com.android.application" version "8.1.0" apply false
+}
+
+include ":app"
+'''
+
+with open('settings.gradle', 'w', encoding='utf-8') as f:
+    f.write(content)
+print("settings.gradle written successfully")

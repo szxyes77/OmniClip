@@ -1,2 +1,4 @@
-pub mod models;
-pub mod monitor;
+mod models;
+mod monitor;
+
+pub use monitor::*;

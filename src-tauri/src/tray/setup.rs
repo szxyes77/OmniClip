@@ -1,68 +1,71 @@
-use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
-use tauri::tray::TrayIconBuilder;
-use tauri::AppHandle;
-use tauri::Manager;
+use tauri::{AppHandle, Manager, tray::TrayIconBuilder, menu::{Menu, MenuItem, PredefinedMenuItem}, Emitter};
 use std::sync::atomic::{AtomicBool, Ordering};
 
-static MONITORING_ENABLED: AtomicBool = AtomicBool::new(true);
+static IS_MONITORING: AtomicBool = AtomicBool::new(true);
 
 pub fn is_monitoring() -> bool {
-    MONITORING_ENABLED.load(Ordering::SeqCst)
+    IS_MONITORING.load(Ordering::SeqCst)
 }
 
 pub fn toggle_monitoring() {
-    let current = MONITORING_ENABLED.load(Ordering::SeqCst);
-    MONITORING_ENABLED.store(!current, Ordering::SeqCst);
+    let current = IS_MONITORING.load(Ordering::SeqCst);
+    IS_MONITORING.store(!current, Ordering::SeqCst);
+}
+
+fn build_menu(app: &AppHandle) -> Result<Menu<tauri::Wry>, String> {
+    let monitor_label = if is_monitoring() { "Pause Monitoring" } else { "Resume Monitoring" };
+    Menu::with_items(app, &[
+        &MenuItem::with_id(app, "show", "Show OmniClip", true, None::<&str>).map_err(|e| e.to_string())?,
+        &PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?,
+        &MenuItem::with_id(app, "monitor", monitor_label, true, None::<&str>).map_err(|e| e.to_string())?,
+        &PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?,
+        &MenuItem::with_id(app, "quit", "Quit OmniClip", true, None::<&str>).map_err(|e| e.to_string())?,
+    ]).map_err(|e| e.to_string())
 }
 
 pub fn setup_system_tray(app: &AppHandle) -> Result<(), String> {
-    let open_main = MenuItem::with_id(app, "open_main", "显示主窗口", true, None::<&str>)
-        .map_err(|e| e.to_string())?;
+    let menu = build_menu(app)?;
 
-    let show_overlay = MenuItem::with_id(app, "show_overlay", "显示悬浮窗 (Alt+V)", true, None::<&str>)
-        .map_err(|e| e.to_string())?;
-
-    let toggle_monitor =
-        MenuItem::with_id(app, "toggle_monitor", "暂停剪贴板监听", true, None::<&str>)
-            .map_err(|e| e.to_string())?;
-
-    let separator = PredefinedMenuItem::separator(app).map_err(|e| e.to_string())?;
-
-    let quit = MenuItem::with_id(app, "quit", "退出 OmniClip", true, None::<&str>)
-        .map_err(|e| e.to_string())?;
-
-    let menu = Menu::with_items(app, &[&open_main, &show_overlay, &toggle_monitor, &separator, &quit])
-        .map_err(|e| e.to_string())?;
-
-    let _tray = TrayIconBuilder::new()
-        .menu(&menu)
-        .on_menu_event(|app, event| match event.id().0.as_str() {
-            "open_main" => {
-                if let Some(window) = app.get_webview_window("main") {
-                    window.show().ok();
-                    window.set_focus().ok();
-                }
-            }
-            "show_overlay" => {
-                let _ = crate::overlay::show_overlay(&app);
-            }
-            "toggle_monitor" => {
-                toggle_monitoring();
-                let is_now_monitoring = is_monitoring();
-                if let Some(menu_item) = app.tray_by_id("main").and_then(|t| t.get_item("toggle_monitor").ok()) {
-                    let label = if is_now_monitoring { "暂停剪贴板监听" } else { "恢复剪贴板监听" };
-                    let _ = menu_item.set_text(label);
-                }
-            }
-            "quit" => {
-                app.exit(0);
-            }
-            _ => {}
-        })
+    let _ = TrayIconBuilder::with_id("main")
         .icon(app.default_window_icon().unwrap().clone())
-        .tooltip("OmniClip - 智能剪贴板管理器")
-        .build(app)
-        .map_err(|e| e.to_string())?;
+        .menu(&menu)
+        .show_menu_on_left_click(true)
+        .tooltip("OmniClip")
+        .on_menu_event(|app, event| {
+            match event.id().as_ref() {
+                "show" => {
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.show();
+                        let _ = window.set_focus();
+                    }
+                }
+                "monitor" => {
+                    toggle_monitoring();
+                    if let Some(window) = app.get_webview_window("main") {
+                        let _ = window.emit("monitoring-state-changed", is_monitoring());
+                    }
+                    if let Some(tray) = app.tray_by_id("main") {
+                        let _ = tray.set_menu(Some(build_menu(app).unwrap()));
+                    }
+                }
+                "quit" => {
+                    std::process::exit(0);
+                }
+                _ => {}
+            }
+        })
+        .on_tray_icon_event(|tray, event| {
+            if let tauri::tray::TrayIconEvent::Click {
+                button: tauri::tray::MouseButton::Left,
+                ..
+            } = event {
+                if let Some(window) = tray.app_handle().get_webview_window("main") {
+                    let _ = window.show();
+                    let _ = window.set_focus();
+                }
+            }
+        })
+        .build(app);
 
     Ok(())
 }
