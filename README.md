@@ -47,10 +47,10 @@ OmniClip 是一款跨平台剪贴板管理工具，包含 **桌面端 (Tauri + R
 
 ```
 ┌─────────────┐                    ┌─────────────┐
-│  手机 (Flutter) │◄── SSE 长连接 ────│  PC (Tauri)  │
+│手机 (Flutter)│◄── SSE 长连接 ──── │  PC (Tauri) │
 │             │                    │             │
-│  实时接收推送  │◄─clipboard-update│ 剪贴板监控    │
-│  发送文本到PC │─POST /api/sync──►│ 存储+广播    │
+│  实时接收推送│◄─clipboard-update  │ 剪贴板监控   │
+│  发送文本到PC│─POST /api/sync──►  │ 存储+广播    │
 └─────────────┘                    └─────────────┘
 
 传输协议: HTTP (端口 18911) + SSE 实时推送
